@@ -1,0 +1,31 @@
+buildscript {
+    ext {
+        buildToolsVersion = "34.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        ndkVersion = "25.1.8937393"
+        kotlinVersion = "1.8.0"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"
+
+// Force coroutines 1.7.3 to match Kotlin 1.8.x
+subprojects { project ->
+    project.configurations.all { config ->
+        config.resolutionStrategy { strategy ->
+            strategy.force "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+            strategy.force "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+        }
+    }
+}

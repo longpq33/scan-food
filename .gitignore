@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+*.keystore
+
+# iOS
+ios/Pods/
+ios/build/
+
+# Misc
+.DS_Store
+.idea/
+.vscode/
+*.log
