@@ -11,6 +11,7 @@ import {
 import {
   launchImageLibrary,
   ImagePickerResponse,
+  launchCamera,
 } from 'react-native-image-picker';
 import {recognizeDishFromServerWithMeta} from '../services/foodRecognition';
 
@@ -61,16 +62,61 @@ export default function ScanScreen(): React.JSX.Element {
     );
   };
 
+  const capturePhoto = () => {
+    setResult(null);
+    launchCamera(
+      {mediaType: 'photo', saveToPhotos: true},
+      async (res: ImagePickerResponse) => {
+        if (res.didCancel) {
+          return;
+        }
+        if (res.errorCode) {
+          Alert.alert('Lỗi', res.errorMessage || res.errorCode);
+          return;
+        }
+        const asset = res.assets?.[0];
+        if (!asset?.uri) {
+          return;
+        }
+        setPreview(asset.uri);
+        try {
+          setIsBusy(true);
+          const prediction = await recognizeDishFromServerWithMeta({
+            uri: asset.uri,
+            name: asset.fileName || 'photo.jpg',
+            type: asset.type || 'image/jpeg',
+          });
+          setResult({
+            name: prediction.dishName,
+            confidence: prediction.confidence,
+          });
+        } catch (e: any) {
+          Alert.alert('Nhận diện lỗi', e?.message || 'Unknown');
+        } finally {
+          setIsBusy(false);
+        }
+      },
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        disabled={isBusy}
-        style={styles.button}
-        onPress={pickImage}>
-        <Text style={styles.buttonText}>
-          {isBusy ? 'Đang nhận diện...' : 'Chọn ảnh từ thư viện'}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.buttonsRow}>
+        <TouchableOpacity
+          disabled={isBusy}
+          style={[styles.button, styles.buttonHalf]}
+          onPress={pickImage}>
+          <Text style={styles.buttonText}>
+            {isBusy ? 'Đang nhận diện...' : 'Chọn ảnh'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={isBusy}
+          style={[styles.button, styles.buttonHalf]}
+          onPress={capturePhoto}>
+          <Text style={styles.buttonText}>Chụp ảnh</Text>
+        </TouchableOpacity>
+      </View>
 
       {preview && (
         <Image
@@ -105,6 +151,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 16,
+  },
+  buttonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+    width: '100%',
+  },
+  buttonHalf: {
+    flex: 1,
   },
   buttonText: {color: '#FFFFFF', fontWeight: 'bold'},
   preview: {width: '100%', height: 260, borderRadius: 12, marginTop: 12},
