@@ -17,8 +17,9 @@ import {
 import HomeScreen from './src/screens/HomeScreen';
 import ScanScreen from './src/screens/ScanScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
+import UserProfileScreen from './src/screens/UserProfileScreen';
 
-type TabKey = 'home' | 'scan' | 'history';
+type TabKey = 'home' | 'scan' | 'history' | 'profile';
 
 const GREEN = '#2E7D32';
 const GREEN_LIGHT = '#388E3C';
@@ -34,6 +35,7 @@ function App(): React.JSX.Element {
         {tab === 'home' && <HomeScreen />}
         {tab === 'scan' && <ScanScreen />}
         {tab === 'history' && <HistoryScreen />}
+        {tab === 'profile' && <UserProfileScreen />}
       </View>
 
       <View style={[styles.tabBar, {backgroundColor: GREEN}]}>
@@ -60,6 +62,14 @@ function App(): React.JSX.Element {
           ]}
           onPress={() => setTab('history')}>
           <Text style={styles.tabText}>History</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tabBtn,
+            tab === 'profile' && {backgroundColor: GREEN_LIGHT},
+          ]}
+          onPress={() => setTab('profile')}>
+          <Text style={styles.tabText}>Profile</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
